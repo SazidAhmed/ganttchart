@@ -30,15 +30,29 @@ Include it in your HTML:
 And start hacking:
 ```js
 var tasks = [
-  {
-    id: 'Task 1',
-    name: 'Redesign website',
-    start: '2016-12-28',
-    end: '2016-12-31',
-    progress: 20,
-    dependencies: 'Task 2, Task 3',
-    custom_class: 'bar-milestone' // optional
-  },
+    {
+        start: '2018-10-01 00',
+        end: '2018-10-01 05',
+        name: 'Redesign website',
+        id: "Task 0",
+        progress: 20
+    },
+    {
+        start: '2018-10-01 01',
+        end: '2018-10-01 08',
+        name: 'Write new content',
+        id: "Task 1",
+        progress: 5,
+        dependencies: 'Task 0'
+    },
+    {
+        start: '2018-10-01 07',
+        end: '2018-10-01 18',
+        name: 'Apply new styles',
+        id: "Task 2",
+        progress: 10,
+        dependencies: 'Task 1'
+    }
   ...
 ]
 var gantt = new Gantt("#gantt", tasks);
@@ -50,12 +64,12 @@ var gantt = new Gantt("#gantt", tasks, {
     header_height: 50,
     column_width: 30,
     step: 24,
-    view_modes: ['Quarter Day', 'Half Day', 'Day', 'Week', 'Month'],
+    view_modes: ['Hour','Quarter Day', 'Half Day', 'Day', 'Week', 'Month'],
     bar_height: 20,
     bar_corner_radius: 3,
     arrow_curve: 5,
     padding: 18,
-    view_mode: 'Day',   
+    view_mode: 'Hour',   
     date_format: 'YYYY-MM-DD',
     custom_popup_html: null
 });
