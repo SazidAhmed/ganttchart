@@ -541,7 +541,7 @@ class Bar {
             height: this.height,
             rx: this.corner_radius,
             ry: this.corner_radius,
-            class: 'bar',
+            class: 'bar' + this.task.custom_class, //added ' + this.task.custom_class'
             append_to: this.bar_group
         });
 
