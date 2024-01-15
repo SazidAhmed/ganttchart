@@ -21,6 +21,8 @@
 		}
 
 		.cc-red g rect { fill: red !important; }
+		.cc-blue g rect { fill: blue !important; }
+		.cc-green g rect { fill: green !important; }
 	</style>
 	<link rel="stylesheet" href="dist/frappe-gantt.css" />
 	<script src="dist/frappe-gantt.js"></script>
@@ -48,7 +50,7 @@
 				id: "Task 1",
 				progress: 5,
 				dependencies: 'Task 0',
-				custom_class: 'cc-red'
+				custom_class: 'cc-blue'
 			},
 			{
 				start: '2018-10-01 07',
@@ -57,7 +59,7 @@
 				id: "Task 2",
 				progress: 10,
 				dependencies: 'Task 1',
-				custom_class: 'cc-red'
+				custom_class: 'cc-green'
 			}
 		]
 		var gantt_chart = new Gantt(".gantt-target", tasks, {
