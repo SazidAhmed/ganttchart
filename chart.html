@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Gantt</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #ccc;
+    }
+
+    .container {
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    /* custom class */
+    .gantt .bar-milestone .bar {
+      fill: tomato;
+    }
+
+    .cc-red g rect {
+      fill: red !important;
+    }
+
+    .cc-blue g rect {
+      fill: blue !important;
+    }
+
+    .cc-green g rect {
+      fill: green !important;
+    }
+  </style>
+  <link rel="stylesheet" href="dist/frappe-gantt.css" />
+  <script src="dist/frappe-gantt.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Interactive Gantt Chart entirely made in SVG!</h2>
+    <div class="gantt-target"></div>
+  </div>
+  <button onclick="addNewTask()">Add New Task</button>
+
+  <script>
+    var names = [
+      ["Redesign website", [0, 7]],
+      ["Write new content", [1, 4]],
+      ["Apply new styles", [3, 6]],
+      ["Review", [7, 7]],
+      ["Deploy", [8, 9]],
+      ["Go Live!", [10, 10]]
+    ];
+
+    var tasks = names.map(function (name, i) {
+      var today = new Date();
+      var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      start.setDate(today.getDate() + name[1][0]);
+      end.setDate(today.getDate() + name[1][1]);
+      return {
+        start: start,
+        end: end,
+        name: name[0],
+        id: "Task " + i,
+        progress: parseInt(Math.random() * 100, 10)
+      }
+    });
+
+    tasks[1].progress = 0;
+    tasks[1].dependencies = "Task 0";
+    tasks[2].dependencies = "Task 1";
+    tasks[3].dependencies = "Task 2";
+    tasks[5].dependencies = "Task 4";
+    tasks[5].custom_class = "bar-milestone";
+
+    var gantt_chart = new Gantt(".gantt-target", tasks, {
+      on_click: function (task) {
+        console.log(task);
+      },
+      on_date_change: function (task, start, end) {
+        console.log(task, start, end);
+      },
+      on_progress_change: function (task, progress) {
+        console.log(task, progress);
+      },
+      on_view_change: function (mode) {
+        console.log(mode);
+      },
+      view_mode: 'Hour',
+      language: 'en'
+    });
+
+    function addNewTask() {
+      var task = RandomTask('Task ' + tasks.length);
+      tasks.push(task);
+      gantt_chart.refresh(tasks);
+      console.log('tasks array:',tasks);
+    }
+
+    function RandomTask(deps) {
+      var start = new Date();
+      start.setDate(start.getDate() + 11 + randomInt(2));
+
+      var end = new Date();
+      end.setDate(start.getDate() + randomInt(7));
+
+      return {
+        start: start,
+        end: end,
+        name: 'Party',
+        id: 'Task ' + tasks.length,
+        progress: randomInt(100),
+        dependencies: deps
+      };
+    }
+
+    function randomInt(limit) {
+      return Math.floor(Math.random() * limit);
+    }
+  </script>
+</body>
+
+</html>

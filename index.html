@@ -20,9 +20,17 @@
 			fill: tomato;
 		}
 
-		.cc-red g rect { fill: red !important; }
-		.cc-blue g rect { fill: blue !important; }
-		.cc-green g rect { fill: green !important; }
+		.cc-red g rect {
+			fill: red !important;
+		}
+
+		.cc-blue g rect {
+			fill: blue !important;
+		}
+
+		.cc-green g rect {
+			fill: green !important;
+		}
 	</style>
 	<link rel="stylesheet" href="dist/frappe-gantt.css" />
 	<script src="dist/frappe-gantt.js"></script>
@@ -32,20 +40,21 @@
 	<div class="container">
 		<h2>Interactive Gantt Chart entirely made in SVG!</h2>
 		<div class="gantt-target"></div>
+		<button onclick="addNewTask()">Add New Task</button>
 	</div>
 	<script>
-		var tasks = [
+		var taskList = [
 			{
-				start: '2018-10-01 00',
-				end: '2018-10-01 05',
+				start: '2024-01-18 00:00:00',
+				end: '2024-01-18 02:00:00',
 				name: 'Redesign website',
 				id: "Task 0",
 				progress: 20,
 				custom_class: 'cc-red'
 			},
 			{
-				start: '2018-10-01 01',
-				end: '2018-10-01 08',
+				start: '2024-01-18 01:00:00',
+				end: '2024-01-18 04:00:00',
 				name: 'Write new content',
 				id: "Task 1",
 				progress: 5,
@@ -53,21 +62,65 @@
 				custom_class: 'cc-blue'
 			},
 			{
-				start: '2018-10-01 07',
-				end: '2018-10-01 18',
+				start: '2024-01-18 04:00:00',
+				end: '2024-01-18 06:00:00',
 				name: 'Apply new styles',
 				id: "Task 2",
 				progress: 10,
 				dependencies: 'Task 1',
 				custom_class: 'cc-green'
 			}
-		]
+		];
+
+		function formatDateTime(date) {
+			var year = date.getFullYear();
+			var month = ('0' + (date.getMonth() + 1)).slice(-2);
+			var day = ('0' + date.getDate()).slice(-2);
+			var hours = ('0' + date.getHours()).slice(-2);
+			var minutes = ('0' + date.getMinutes()).slice(-2);
+			var seconds = ('0' + date.getSeconds()).slice(-2);
+
+			// Construct the formatted date string
+			var formattedDate = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+
+			return formattedDate;
+		}
+
+		var tasks = taskList.map(function (task, i) {
+			var today = new Date();
+			var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+			var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+			start.setDate(today.getDate());
+			end.setDate(today.getDate());
+			return {
+				start: task.start,
+				end: task.end,
+				name: task.name,
+				id: "Task " + i,
+				progress: parseInt(Math.random() * 100, 10),
+				custom_class: task.custom_class
+			}
+		});
+
 		var gantt_chart = new Gantt(".gantt-target", tasks, {
 			on_click: function (task) {
 				console.log(task);
 			},
 			on_date_change: function (task, start, end) {
-				console.log(task, start, end);
+				console.log('on date/time change: task:', task);
+				console.log('on date/time change: start:', start);
+				console.log('on date/time change: end:', end);
+				console.log('tasks array:', tasks);
+
+				// Find the corresponding task in the tasks array
+				var updatedTask = tasks.find(t => t.id === task.id);
+
+				// Update the start and end dates of the task
+				updatedTask.start = formatDateTime(start);
+				updatedTask.end = formatDateTime(end);
+
+				// Log the updated tasks array
+				console.log('Updated tasks array:', tasks);
 			},
 			on_progress_change: function (task, progress) {
 				console.log(task, progress);
@@ -78,6 +131,22 @@
 			view_mode: 'Hour',
 			language: 'en'
 		});
+
+		function addNewTask() {
+			var task = {
+				start: '2024-01-18 07',
+				end: '2024-01-18 18',
+				name: 'Testing',
+				id: 'Task ' + tasks.length,
+				progress: parseInt(Math.random() * 100, 10),
+				custom_class: 'cc-red',
+				dependencies: '',
+			};
+			tasks.push(task);
+			console.log('Task List:', taskList);
+			gantt_chart.refresh(tasks);
+			console.log('tasks array:', tasks);
+		}
 		console.log(gantt_chart);
 	</script>
 </body>
