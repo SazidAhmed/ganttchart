@@ -641,7 +641,7 @@ class Bar {
                 return;
             }
 
-            this.show_popup();
+            // this.show_popup();
             this.gantt.unselect_all();
             this.group.classList.add('active');
         });
