@@ -106,26 +106,26 @@
 			}
 		});
 
-		function applyWorkHourStyles() {
-			// Select all time tick elements
-			const lowerTextElements = document.querySelectorAll(".lower-text");
-			const timeContainer = document.querySelector(".date"); // Adjust the selector if needed
-			let hiddenElements = 0;
-			lowerTextElements.forEach((element) => {
-				const timeText = element.textContent.trim();
-				if (
-					["01", "02", "03", "04", "05", "06", "07", "18", "19", "20", "21", "22", "23", "00"].includes(timeText)
-				) {
-					element.style.display = "none";
-					hiddenElements++;
-				}
-			});
-			if (timeContainer) {
-				const originalWidth = timeContainer.getBBox().width;
-				const newWidth = (originalWidth / 24) * (24 - hiddenElements); // Calculate new width based on visible elements
-				timeContainer.setAttribute('width', newWidth);
-			}
-		}
+        function applyWorkHourStyles() {
+            // Select all time tick elements
+            const lowerTextElements = document.querySelectorAll(".lower-text");
+            lowerTextElements.forEach((element) => {
+                const timeText = element.textContent.trim();
+                if (
+                    ["01", "02", "03", "04", "05", "06", "07", "18", "19", "20", "21", "22", "23", "00"].includes(timeText)
+                ) {
+                    element.style.display = "none";
+                }
+            });
+
+            // Adjust the Gantt chart width
+            const svg = document.querySelector(".gantt svg");
+            const visibleHours = 10; // Number of hours we want to display (08 to 17)
+            const totalHours = 24; // Total hours in a day
+            const svgWidth = svg.getBBox().width;
+            const newWidth = (svgWidth / totalHours) * visibleHours * tasks.length;
+            svg.setAttribute('width', newWidth);
+        }
 
 		var gantt_chart = new Gantt(".gantt-target", tasks, {
 			on_click: function (task) {
@@ -147,15 +147,19 @@
 				// Log the updated tasks array
 				console.log('Updated tasks array:', tasks);
 				// Reapply work hour styles
-				applyWorkHourStyles();
+				// applyWorkHourStyles();
 			},
 			on_progress_change: function (task, progress) {
 				console.log(task, progress);
 			},
 			on_view_change: function (mode) {
-				console.log(mode);
-				// Reapply work hour styles
-				applyWorkHourStyles();
+				const svg = document.querySelector(".gantt");
+                    console.log(svg);  // Debugging statement
+                    if (svg) {
+                        applyWorkHourStyles(svg);
+                    } else {
+                        console.error("SVG element not found.");
+                    }
 			},
 			view_mode: 'Hour',
 			language: 'en'
@@ -176,7 +180,7 @@
 			tasks.push(task);
 			console.log('Task List:', taskList);
 			gantt_chart.refresh(tasks);
-			applyWorkHourStyles();
+			
 			console.log('tasks array:', tasks);
 		}
 		console.log(gantt_chart);
