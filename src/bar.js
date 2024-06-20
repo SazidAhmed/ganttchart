@@ -299,18 +299,44 @@ export default class Bar {
         return parseInt(progress, 10);
     }
 
+    // compute_x() {
+    //     const { step, column_width } = this.gantt.options;
+    //     const task_start = this.task._start;
+    //     const gantt_start = this.gantt.gantt_start;
+
+    //     const diff = date_utils.diff(task_start, gantt_start, 'hour');
+    //     let x = diff / step * column_width;
+
+    //     if (this.gantt.view_is('Month')) {
+    //         const diff = date_utils.diff(task_start, gantt_start, 'day');
+    //         x = diff * column_width / 30;
+    //     }
+    //     return x;
+    // }
+
     compute_x() {
         const { step, column_width } = this.gantt.options;
         const task_start = this.task._start;
         const gantt_start = this.gantt.gantt_start;
-
-        const diff = date_utils.diff(task_start, gantt_start, 'hour');
-        let x = diff / step * column_width;
-
-        if (this.gantt.view_is('Month')) {
-            const diff = date_utils.diff(task_start, gantt_start, 'day');
-            x = diff * column_width / 30;
+    
+        let diff = 0;
+        let current_date = new Date(gantt_start);
+    
+        while (current_date < task_start) {
+            const hour = current_date.getHours();
+            if (hour >= 7 && hour <= 16) {
+                diff += step;
+            }
+            current_date = date_utils.add(current_date, step, 'hour');
         }
+    
+        let x = (diff / step * column_width) - column_width;
+    
+        if (this.gantt.view_is('Month')) {
+            const day_diff = date_utils.diff(task_start, gantt_start, 'day');
+            x = day_diff * column_width / 30;
+        }
+    
         return x;
     }
 
