@@ -201,7 +201,7 @@ export default {
         seconds = milliseconds / 1000;
         minutes = seconds / 60;
         hours = minutes / 60;
-        days = hours / 9;
+        days = hours / 24;
         months = days / 30;
         years = months / 12;
 
