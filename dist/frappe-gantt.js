@@ -656,24 +656,24 @@ class Bar {
         });
     }
 
-    show_popup() {
-        if (this.gantt.bar_being_dragged) return;
+    // show_popup() {
+    //     if (this.gantt.bar_being_dragged) return;
 
-        const start_date = date_utils.format(this.task._start, 'MMM D', this.gantt.options.language);
-        const end_date = date_utils.format(
-            date_utils.add(this.task._end, -1, 'second'),
-            'MMM D',
-            this.gantt.options.language
-        );
-        const subtitle = start_date + ' - ' + end_date;
+    //     const start_date = date_utils.format(this.task._start, 'MMM D', this.gantt.options.language);
+    //     const end_date = date_utils.format(
+    //         date_utils.add(this.task._end, -1, 'second'),
+    //         'MMM D',
+    //         this.gantt.options.language
+    //     );
+    //     const subtitle = start_date + ' - ' + end_date;
 
-        this.gantt.show_popup({
-            target_element: this.$bar,
-            title: this.task.name,
-            subtitle: subtitle,
-            task: this.task,
-        });
-    }
+    //     this.gantt.show_popup({
+    //         target_element: this.$bar,
+    //         title: this.task.name,
+    //         subtitle: subtitle,
+    //         task: this.task,
+    //     });
+    // }
 
     update_bar_position({ x = null, width = null }) {
         const bar = this.$bar;
@@ -1041,7 +1041,12 @@ class Gantt {
             date_format: 'YYYY-MM-DD',
             popup_trigger: 'click',
             custom_popup_html: null,
-            language: 'en'
+            language: 'en',
+            business_closed_dates:[],
+            show_today_highlight: true,
+            show_saturday_highlight: false,
+            show_sunday_highlight: false,
+            show_business_closed_dates: false
         };
         this.options = Object.assign({}, default_options, options);
     }
@@ -1060,6 +1065,10 @@ class Gantt {
 
             // cache index
             task._index = i;
+
+            if (typeof task.row_id === 'number') {
+                task._index = task.row_id;
+            }
 
             // invalid dates
             if (!task.start && !task.end) {
@@ -1168,13 +1177,19 @@ class Gantt {
     setup_gantt_dates() {
         this.gantt_start = this.gantt_end = null;
 
-        for (let task of this.tasks) {
-            // set global start and end date
-            if (!this.gantt_start || task._start < this.gantt_start) {
-                this.gantt_start = task._start;
-            }
-            if (!this.gantt_end || task._end > this.gantt_end) {
-                this.gantt_end = task._end;
+        if (this.tasks.length < 1) {
+            const date_start = new Date();
+            this.gantt_start = `${date_start.getFullYear()}-${(date_start.getMonth() + 1 < 10 ? `0${date_start.getMonth() + 1}` : date_start.getMonth() + 1)}-${date_start.getDate()}`;
+            this.gantt_end = `${date_start.getFullYear() + 1}-${(date_start.getMonth() + 1 < 10 ? `0${date_start.getMonth() + 1}` : date_start.getMonth() + 1)}-${date_start.getDate()}`;
+        } else {
+            for (let task of this.tasks) {
+                // set global start and end date
+                if (!this.gantt_start || task._start < this.gantt_start) {
+                    this.gantt_start = task._start;
+                }
+                if (!this.gantt_end || task._end > this.gantt_end) {
+                    this.gantt_end = task._end;
+                }
             }
         }
 
@@ -1258,13 +1273,38 @@ class Gantt {
         this.make_grid_highlights();
     }
 
+    // make_grid_background() {
+    //     const grid_width = this.dates.length * this.options.column_width;
+    //     const grid_height =
+    //         this.options.header_height +
+    //         this.options.padding +
+    //         (this.options.bar_height + this.options.padding) *
+    //             this.tasks.length;
+
+    //     createSVG('rect', {
+    //         x: 0,
+    //         y: 0,
+    //         width: grid_width,
+    //         height: grid_height,
+    //         class: 'grid-background',
+    //         append_to: this.layers.grid
+    //     });
+
+    //     $.attr(this.$svg, {
+    //         height: grid_height + this.options.padding + 100,
+    //         width: '100%'
+    //     });
+    // }
+
     make_grid_background() {
         const grid_width = this.dates.length * this.options.column_width;
+        // check distinct rows so the grid height isn't relative to the total tasks
+        const distinct_rows = [...new Set(this.tasks.map(x => x.row_id))];
         const grid_height =
             this.options.header_height +
             this.options.padding +
             (this.options.bar_height + this.options.padding) *
-                this.tasks.length;
+                distinct_rows.length;
 
         createSVG('rect', {
             x: 0,
@@ -1272,25 +1312,65 @@ class Gantt {
             width: grid_width,
             height: grid_height,
             class: 'grid-background',
-            append_to: this.layers.grid
+            append_to: this.layers.grid,
         });
 
         $.attr(this.$svg, {
-            height: grid_height + this.options.padding + 100,
-            width: '100%'
+            // +XX is required so info is shown correctly - 50 seems like a good middle ground
+            height: grid_height, 
+            // height: grid_height + this.options.padding + 50, 
+            width: '100%',
         });
     }
 
+    // make_grid_rows() {
+    //     const rows_layer = createSVG('g', { append_to: this.layers.grid });
+    //     const lines_layer = createSVG('g', { append_to: this.layers.grid });
+
+    //     const row_width = this.dates.length * this.options.column_width;
+    //     const row_height = this.options.bar_height + this.options.padding;
+
+    //     let row_y = this.options.header_height + this.options.padding / 2;
+
+    //     for (let task of this.tasks) {
+    //         createSVG('rect', {
+    //             x: 0,
+    //             y: row_y,
+    //             width: row_width,
+    //             height: row_height,
+    //             class: 'grid-row',
+    //             append_to: rows_layer
+    //         });
+
+    //         createSVG('line', {
+    //             x1: 0,
+    //             y1: row_y + row_height,
+    //             x2: row_width,
+    //             y2: row_y + row_height,
+    //             class: 'row-line',
+    //             append_to: lines_layer
+    //         });
+
+    //         row_y += this.options.bar_height + this.options.padding;
+    //     }
+    // }
+
     make_grid_rows() {
+        let counter_rows = 0;
+        const distinctRows = [...new Set(this.tasks.map(x => x.row_id))];
+        for (let row of distinctRows){
+            counter_rows = counter_rows + 1;
+        }
+        console.log(counter_rows + " unique rows");
+
         const rows_layer = createSVG('g', { append_to: this.layers.grid });
         const lines_layer = createSVG('g', { append_to: this.layers.grid });
-
         const row_width = this.dates.length * this.options.column_width;
         const row_height = this.options.bar_height + this.options.padding;
-
         let row_y = this.options.header_height + this.options.padding / 2;
+        //var counter = 0;
 
-        for (let task of this.tasks) {
+        for (let row of distinctRows) {
             createSVG('rect', {
                 x: 0,
                 y: row_y,
@@ -1312,7 +1392,7 @@ class Gantt {
             row_y += this.options.bar_height + this.options.padding;
         }
     }
-
+    
     make_grid_header() {
         const header_width = this.dates.length * this.options.column_width;
         const header_height = this.options.header_height + 10;
@@ -1325,6 +1405,8 @@ class Gantt {
             append_to: this.layers.grid
         });
     }
+
+    //checked till this.
 
     make_grid_ticks() {
         let tick_x = 0;
@@ -1369,32 +1451,91 @@ class Gantt {
         }
     }
 
-    make_grid_highlights() {
-        // highlight today's date
-        if (this.view_is(VIEW_MODE.DAY)) {
-            const x =
-                date_utils.diff(date_utils.today(), this.gantt_start, 'hour') /
-                this.options.step *
-                this.options.column_width;
-            const y = 0;
+    // make_grid_highlights() {
+    //     if (this.view_is(VIEW_MODE.DAY)) {
+    //         const x =
+    //             date_utils.diff(date_utils.today(), this.gantt_start, 'hour') /
+    //             this.options.step *
+    //             this.options.column_width;
+    //         const y = 0;
 
-            const width = this.options.column_width;
-            const height =
+    //         const width = this.options.column_width;
+    //         const height =
+    //             (this.options.bar_height + this.options.padding) *
+    //                 this.tasks.length +
+    //             this.options.header_height +
+    //             this.options.padding / 2;
+
+    //         createSVG('rect', {
+    //             x,
+    //             y,
+    //             width,
+    //             height,
+    //             class: 'today-highlight',
+    //             append_to: this.layers.grid
+    //         });
+    //     }
+    // }
+
+    make_grid_highlights() {
+        // highlight saturday dates
+
+        if (this.view_is(VIEW_MODE.DAY)) {
+            // highlight today's date
+            if (this.options.show_today_highlight){
+                this.make_highlight_bar(date_utils.today(), 'today-highlight');
+            }
+            // show weekend highlights
+            if (this.options.show_saturday_highlight || this.options.show_sunday_highlight){
+                for (var D = new Date(this.gantt_start); D <= this.gantt_end; D.setDate(D.getDate() + 1)){
+                    if (
+                        (D.getDay() == 0 && this.options.show_sunday_highlight) ||
+                        (D.getDay() == 6 && this.options.show_saturday_highlight)
+                    ){
+                        this.make_highlight_bar(D, 'noneworkingday-highlight');
+                    }
+                }
+
+            }
+
+             // Highlight business closed dates
+            if (this.options.show_business_closed_dates && Array.isArray(this.options.business_closed_dates)) {
+                for (const closedDate of this.options.business_closed_dates) {
+                    const date = new Date(closedDate);
+                    if (date >= this.gantt_start && date <= this.gantt_end) {
+                        this.make_highlight_bar(date, 'noneworkingday-highlight');
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    make_highlight_bar(the_date, highlight_class){
+        const x = (date_utils.diff(the_date, this.gantt_start, 'hour') /
+            this.options.step) *
+            this.options.column_width;
+        const y = 0;
+
+        const width = this.options.column_width;
+        const height =
                 (this.options.bar_height + this.options.padding) *
                     this.tasks.length +
                 this.options.header_height +
                 this.options.padding / 2;
 
-            createSVG('rect', {
-                x,
-                y,
-                width,
-                height,
-                class: 'today-highlight',
-                append_to: this.layers.grid
-            });
-        }
+        createSVG('rect', {
+            x,
+            y,
+            width,
+            height,
+            class: highlight_class,
+            // @ts-ignore
+            append_to: this.layers.grid,
+        });
     }
+
 
     make_dates() {
         for (let date of this.get_dates_to_draw()) {
@@ -1845,16 +1986,16 @@ class Gantt {
         });
     }
 
-    show_popup(options) {
-        // if (!this.popup) {
-        //     this.popup = new Popup(
-        //         this.popup_wrapper,
-        //         this.options.custom_popup_html
-        //     );
-        // }
-        // this.popup.show(options);
-        this.popup && this.popup.hide();
-    }
+    // show_popup(options) {
+    //     if (!this.popup) {
+    //         this.popup = new Popup(
+    //             this.popup_wrapper,
+    //             this.options.custom_popup_html
+    //         );
+    //     }
+    //     this.popup.show(options);
+    //     this.popup && this.popup.hide();
+    // }
 
     hide_popup() {
         this.popup && this.popup.hide();
