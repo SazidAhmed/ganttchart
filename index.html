@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 	<meta charset="UTF-8">
 	<title>Simple Gantt</title>
@@ -9,174 +8,150 @@
 			font-family: sans-serif;
 			background: #ccc;
 		}
-
 		.container {
 			width: 80%;
 			margin: 0 auto;
 		}
-
 		/* custom class */
 		.gantt .bar-milestone .bar {
 			fill: tomato;
-		}
-
-		.cc-red g rect {
-			fill: red !important;
-		}
-
-		.cc-blue g rect {
-			fill: blue !important;
-		}
-
-		.cc-green g rect {
-			fill: green !important;
-		}
-
-		.hidden-tick {
-			display: none !important;
 		}
 	</style>
 	<link rel="stylesheet" href="dist/frappe-gantt.css" />
 	<script src="dist/frappe-gantt.js"></script>
 </head>
-
 <body>
 	<div class="container">
 		<h2>Interactive Gantt Chart entirely made in SVG!</h2>
 		<div class="gantt-target"></div>
-		<!-- <button onclick="addNewTask()">Add New Task</button> -->
 	</div>
 	<script>
-		var taskList = [
-			{
-				start: '2024-06-25 08:00:00',
-				end: '2024-06-25 17:00:00',
-				name: 'Redesign website',
-				id: "Task 0",
-				progress: 20,
-				custom_class: 'cc-red'
+		var tasks = [
+		{
+				id: "1",
+				row_id: 0,
+				task_id: 63,
+				org_id: 3,
+				crew_id: 22,
+				crew: "Kenny",
+				trade_id: 25,
+				name: "Task X",
+				start: "2024-07-08 08:00:00",
+				end: "2024-07-08 17:00:00",
+				isExtended: false,
+				durationDay: 1,
+				progress: 0,
+				color: "rgb(29,11,228)",
+				monumentTask: true,
+				solution_found: true,
+				backupStartDate: "2024-07-08 08:00:00",
+				backupEndDate: "2024-07-08 17:00:00",
+				backupCrewID: 22,
+				backupCrewName: "Kenny",
 			},
 			{
-				start: '2024-06-26 08:00:00',
-				end: '2024-06-26 17:00:00',
-				name: 'Write new content',
-				id: "Task 1",
-				progress: 5,
-				dependencies: 'Task 0',
-				custom_class: 'cc-blue'
+				id: "2",
+				row_id: 0,
+				task_id: 64,
+				org_id: 3,
+				crew_id: 22,
+				crew: "Kenny",
+				trade_id: 25,
+				name: "Task Y",
+				start: "2024-07-09 08:00:00",
+				end: "2024-07-09 17:00:00",
+				isExtended: false,
+				durationDay: 1,
+				progress: 0,
+				color: "rgb(29,11,228)",
+				monumentTask: false,
+				solution_found: true,
+				backupStartDate: "2024-07-09 10:00:00",
+				backupEndDate: "2024-07-09 11:59:59",
+				backupCrewID: 31,
+				backupCrewName: "John",
 			},
 			{
-				start: '2024-06-27 08:00:00',
-				end: '2024-06-27 17:00:00',
-				name: 'Apply new styles',
-				id: "Task 2",
-				progress: 10,
-				dependencies: 'Task 1',
-				custom_class: 'cc-green'
-			}
-		];
-
-		function formatDateTime(date) {
-			var year = date.getFullYear();
-			var month = ('0' + (date.getMonth() + 1)).slice(-2);
-			var day = ('0' + date.getDate()).slice(-2);
-			var hours = ('0' + date.getHours()).slice(-2);
-			var minutes = ('0' + date.getMinutes()).slice(-2);
-			var seconds = ('0' + date.getSeconds()).slice(-2);
-
-			// Construct the formatted date string
-			var formattedDate = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
-
-			return formattedDate;
-		}
-
-		var tasks = taskList.map(function (task, i) {
-			var today = new Date();
-			var start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-			var end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-			start.setDate(today.getDate());
-			end.setDate(today.getDate());
-			return {
-				start: task.start,
-				end: task.end,
-				name: task.name,
-				id: "Task " + i,
-				progress: parseInt(Math.random() * 100, 10),
-				custom_class: task.custom_class
-			}
-		});
-
-        function applyWorkHourStyles() {
-            // Select all time tick elements
-            const lowerTextElements = document.querySelectorAll(".lower-text");
-            lowerTextElements.forEach((element) => {
-                const timeText = element.textContent.trim();
-                if (
-                    ["01", "02", "03", "04", "05", "06", "07", "18", "19", "20", "21", "22", "23", "00"].includes(timeText)
-                ) {
-                    element.style.display = "none";
-                }
-            });
-
-            // Adjust the Gantt chart width
-            const svg = document.querySelector(".gantt svg");
-            const visibleHours = 9; // Number of hours we want to display (08 to 17)
-            const totalHours = 9; // Total hours in a day
-            const svgWidth = svg.getBBox().width;
-            const newWidth = (svgWidth / totalHours) * visibleHours * tasks.length;
-            svg.setAttribute('width', newWidth);
-        }
-
+				id: "3",
+				row_id: 0,
+				task_id: 65,
+				crew_id: 22,
+				crew: "Kenny",
+				trade_id: 24,
+				name: "Task Z",
+				start: "2024-07-10 08:00:00",
+				end: "2024-07-10 17:00:00",
+				isExtended: false,
+				durationDay: 1,
+				progress: 0,
+				color: "rgb(29,11,228)",
+				monumentTask: false,
+				solution_found: true,
+				backupStartDate: "2024-07-10 08:00:00",
+				backupEndDate: "2024-07-10 17:00:00",
+				backupCrewID: 22,
+				backupCrewName: "Kenny",
+			},
+			{
+				id: "4",
+				row_id: 1,
+				task_id: 66,
+				crew_id: 22,
+				crew: "Kenny",
+				trade_id: 24,
+				name: "Task ZA",
+				start: "2024-07-11 08:00:00",
+				end: "2024-07-11 17:00:00",
+				isExtended: false,
+				durationDay: 1,
+				progress: 0,
+				color: "rgb(29,11,228)",
+				monumentTask: false,
+				solution_found: true,
+				backupStartDate: "2024-07-11 08:00:00",
+				backupEndDate: "2024-07-11 17:00:00",
+				backupCrewID: 22,
+				backupCrewName: "Kenny",
+			},
+			{
+				id: "5",
+				row_id: 1,
+				task_id: 67,
+				crew_id: 22,
+				crew: "Kenny",
+				trade_id: 24,
+				name: "Task ZB",
+				start: "2024-07-12 08:00:00",
+				end: "2024-07-12 17:00:00",
+				isExtended: false,
+				durationDay: 1,
+				progress: 0,
+				color: "rgb(29,11,228)",
+				monumentTask: false,
+				solution_found: true,
+				backupStartDate: "2024-07-11 08:00:00",
+				backupEndDate: "2024-07-11 17:00:00",
+				backupCrewID: 22,
+				backupCrewName: "Kenny",
+			},
+		]
 		var gantt_chart = new Gantt(".gantt-target", tasks, {
 			on_click: function (task) {
 				console.log(task);
 			},
-			on_date_change: function (task, start, end) {
-				console.log('on date/time change: task:', task);
-				console.log('on date/time change: start:', start);
-				console.log('on date/time change: end:', end);
-				console.log('tasks array:', tasks);
-
-				// Find the corresponding task in the tasks array
-				var updatedTask = tasks.find(t => t.id === task.id);
-
-				// Update the start and end dates of the task
-				updatedTask.start = formatDateTime(start);
-				updatedTask.end = formatDateTime(end);
-
-				// Log the updated tasks array
-				console.log('Updated tasks array:', tasks);
-				// Reapply work hour styles
-				// applyWorkHourStyles();
+			on_date_change: function(task, start, end) {
+				console.log(task, start, end);
 			},
-			on_progress_change: function (task, progress) {
+			on_progress_change: function(task, progress) {
 				console.log(task, progress);
 			},
-			on_view_change: function (mode) {
-				
+			on_view_change: function(mode) {
+				console.log(mode);
 			},
-			view_mode: 'Hour',
+			view_mode: 'Day',
 			language: 'en'
 		});
-
-		function addNewTask() {
-			var task = {
-				start: '2024-05-28 08:00:00',
-				end: '2024-05-28 17:00:00',
-				name: 'Testing',
-				id: 'Task ' + tasks.length,
-				progress: parseInt(Math.random() * 100, 10),
-				custom_class: 'cc-red',
-				dependencies: '',
-			};
-			tasks.push(task);
-			console.log('Task List:', taskList);
-			gantt_chart.refresh(tasks);
-			
-			console.log('tasks array:', tasks);
-		}
 		console.log(gantt_chart);
 	</script>
 </body>
-
 </html>
